@@ -69,19 +69,37 @@ class aqmInit {
 	}
 
 	/**
-	 * Initialize the plugin and register hooks
+	 * Initialize the plugin
 	 */
 	public function init() {
 
-		// Initialize the plugin
+		// Textdomain
 		add_action( 'init', array( $this, 'load_textdomain' ) );
+
+		// @todo Add the ajax hooks which need to be available with
+		// every page call
+
+		// Add the rest of the hooks which are only needed when the
+		// admin bar is showing
+		add_action( 'admin_bar_init', array( $this, 'admin_bar_init' ) );
+
+	}
+
+	/**
+	 * Add the hooks to display the asset panel in the admin bar
+	 * @since 0.0.1
+	 */
+	public function admin_bar_init() {
+
+		if ( !is_super_admin() || !is_admin_bar_showing() || $this->is_wp_login() || is_admin() ) {
+			return;
+		}
 
 		// Store all assets enqueued in the head
 		add_action( 'wp_head', array( $this, 'store_head_assets' ), 1000 );
 
 		// Store any new assets enqueued in the footer
 		add_action( 'wp_footer', array( $this, 'store_footer_assets' ), 1000 );
-
 	}
 
 	/**
@@ -90,6 +108,17 @@ class aqmInit {
 	 */
 	public function load_textdomain() {
 		load_plugin_textdomain( 'asset-queue-manager', false, plugin_basename( dirname( __FILE__ ) ) . '/languages/' );
+	}
+
+	/**
+	 * Check if we're on the login page, because the admin bar isn't
+	 * shown there. Thanks to debug-bar for the heads-up.
+	 * https://wordpress.org/plugins/debug-bar/
+	 *
+	 * @since 0.0.1
+	 */
+	public function is_wp_login() {
+		return 'wp-login.php' == basename( $_SERVER['SCRIPT_NAME'] );
 	}
 
 	/**
