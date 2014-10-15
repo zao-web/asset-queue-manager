@@ -74,7 +74,6 @@ class aqmInit {
 	public function init() {
 
 		// Initialize the plugin
-		add_action( 'init', array( $this, 'load_config' ) );
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 
 		// Store all assets enqueued in the head
@@ -84,12 +83,6 @@ class aqmInit {
 		add_action( 'wp_footer', array( $this, 'store_footer_assets' ), 1000 );
 
 	}
-
-	/**
-	 * Load the plugin's configuration settings and default content
-	 * @since 0.0.1
-	 */
-	public function load_config() {	}
 
 	/**
 	 * Load the plugin textdomain for localistion
@@ -173,6 +166,19 @@ class aqmInit {
 
 		global $wp_styles;
 		$this->store_asset_list( $wp_styles->done, $wp_styles->registered, 'footer', 'styles' );
+	}
+
+	/**
+	 * Retrieve assets dequeued by this plugin
+	 * @since 0.0.1
+	 */
+	public function get_dequeued_assets() {
+
+		if ( !isset( $this->assets['dequeued'] ) ) {
+			$this->assets['dequeued'] = get_option( 'aqm-dequeued' );
+		}
+
+		return $this->assets['dequeued'];
 	}
 
 }
