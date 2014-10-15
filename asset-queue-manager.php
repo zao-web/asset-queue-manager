@@ -44,6 +44,11 @@ class aqmInit {
 	static $plugin_url;
 
 	/**
+	 * Array of assets to be managed
+	 */
+	public $assets;
+
+	/**
 	 * Create or retrieve the single instance of the class
 	 *
 	 * @since 0.1
@@ -72,6 +77,12 @@ class aqmInit {
 		add_action( 'init', array( $this, 'load_config' ) );
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 
+		// Store all assets enqueued in the head
+		add_action( 'wp_head', array( $this, 'store_head_assets' ), 1000 );
+
+		// Store any new assets enqueued in the footer
+		add_action( 'wp_footer', array( $this, 'store_footer_assets' ), 1000 );
+
 	}
 
 	/**
@@ -85,7 +96,83 @@ class aqmInit {
 	 * @since 0.0.1
 	 */
 	public function load_textdomain() {
-		load_plugin_textdomain( asset-queue-manager, false, plugin_basename( dirname( __FILE__ ) ) . "/languages/" );
+		load_plugin_textdomain( 'asset-queue-manager', false, plugin_basename( dirname( __FILE__ ) ) . '/languages/' );
+	}
+
+	/**
+	 * Store assets found in the list of enqueued assets
+	 * @since 0.0.1
+	 */
+	public function store_asset_list( $enqueued_slugs, $asset_data, $location, $type ) {
+		
+		foreach( $enqueued_slugs as $slug ) {
+			$this->store_asset( $slug, $asset_data[ $slug ], $location, $type );
+		}
+	}
+
+	/**
+	 * Store a single asset's data
+	 * @since 0.0.1
+	 */
+	public function store_asset( $slug, $data, $location, $type ) {
+
+		if ( !isset( $this->assets[ $location ] ) ) {
+			$this->assets[ $location ] = array();
+		}
+
+		if ( !isset( $this->assets[ $location ][ $type ] ) ) {
+			$this->assets[ $location ][ $type ] = array();
+		}
+
+		if ( $this->is_asset_stored( $slug, $location, $type ) ) {
+			return;
+		}
+
+		$this->assets[ $location ][ $type ][ $slug ] = $data;
+	}
+
+	/**
+	 * Check if an asset has already been added to our list
+	 * @since 0.0.1
+	 */
+	public function is_asset_stored( $slug, $location, $type ) {
+
+		// Only check in the footer
+		if ( $location !== 'footer' ) {
+			return false;
+		}
+
+		if ( isset( $this->assets[ 'head' ] ) && isset( $this->assets[ 'head' ][ $type ] ) && isset( $this->assets[ 'head' ][ $type ][ $slug ] ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Store assets enqueued in the head
+	 * @since 0.0.1
+	 */
+	public function store_head_assets() {
+
+		global $wp_scripts;
+		$this->store_asset_list( $wp_scripts->done, $wp_scripts->registered, 'head', 'scripts' );
+
+		global $wp_styles;
+		$this->store_asset_list( $wp_styles->done, $wp_styles->registered, 'head', 'styles' );
+	}
+
+	/**
+	 * Store assets enqueued in the footer
+	 * @since 0.0.1
+	 */
+	public function store_footer_assets() {
+
+		global $wp_scripts;
+		$this->store_asset_list( $wp_scripts->done, $wp_scripts->registered, 'footer', 'scripts' );
+
+		global $wp_styles;
+		$this->store_asset_list( $wp_styles->done, $wp_styles->registered, 'footer', 'styles' );
 	}
 
 }
