@@ -80,6 +80,9 @@ class aqmInit {
 		add_action( 'wp_ajax_nopriv_aqm-modify-asset' , array( $this , 'ajax_nopriv_default' ) );
 		add_action( 'wp_ajax_aqm-modify-asset', array( $this, 'ajax_modify_asset' ) );
 
+		// Add the Assets item to the admin bar
+		add_action( 'admin_bar_menu', array( &$this, 'admin_bar_menu' ) );
+
 		// Add the rest of the hooks which are only needed when the
 		// admin bar is showing
 		add_action( 'admin_bar_init', array( $this, 'admin_bar_init' ) );
@@ -209,6 +212,27 @@ class aqmInit {
 		}
 
 		return $this->assets['dequeued'];
+	}
+
+	/**
+	 * Add an Assets item to the admin bar menu
+	 * @since 0.0.1
+	 */
+	public function admin_bar_menu() {
+
+		if ( is_admin() ) {
+			return;
+		}
+
+		global $wp_admin_bar;
+
+		$wp_admin_bar->add_menu(
+			array(
+				'id'     => 'queue-master',
+				'parent' => 'top-secondary',
+				'title'  => __( 'Assets', 'asset-queue-manager' ),
+			)
+		);
 	}
 
 	/**
