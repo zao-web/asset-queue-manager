@@ -96,6 +96,9 @@ class aqmInit {
 			return;
 		}
 
+		// Enqueue assets for the control panel
+		add_action( 'wp_enqueue_scripts', array( $this, 'register_assets' ) );
+
 		// Store all assets enqueued in the head
 		add_action( 'wp_head', array( $this, 'store_head_assets' ), 1000 );
 
@@ -126,6 +129,47 @@ class aqmInit {
 	 */
 	public function is_wp_login() {
 		return 'wp-login.php' == basename( $_SERVER['SCRIPT_NAME'] );
+	}
+
+	/**
+	 * Enqueue the front-end CSS and Javascript for the control panel
+	 * @since 0.0.1
+	 */
+	public function register_assets() {
+
+		// Load unminified scripts in debug mode
+		if ( WP_DEBUG ) {
+			wp_enqueue_script( 'asset-queue-manager', self::$plugin_url . '/assets/js/aqm.js', array( 'jquery' ), '', true );
+		} else {
+			wp_enqueue_script( 'asset-queue-manager', self::$plugin_url . '/assets/js/aqm.min.js', array( 'jquery' ), '', true );
+		}
+
+		// Add translateable strings, nonce, and URLs for ajax requests
+		wp_localize_script(
+			'asset-queue-manager',
+			'aqm',
+			array(
+				'nonce'		=> wp_create_nonce( 'asset-queue-manager' ),
+				'siteurl'	=> get_bloginfo( 'url' ),
+				'ajaxurl'	=> admin_url('admin-ajax.php'),
+				'strings'	=> array(
+					'head_scripts'		=> __( 'Head Scripts', 'asset-queue-manager' ),
+					'footer_scripts'	=> __( 'Footer Scripts', 'asset-queue-manager' ),
+					'head_styles'		=> __( 'Head Styles', 'asset-queue-manager' ),
+					'footer_styles'		=> __( 'Footer Styles', 'asset-queue-manager' ),
+					'dequeued_scripts'	=> __( 'Dequeued Scripts', 'asset-queue-manager' ),
+					'dequeued_styles'	=> __( 'Dequeued Styles', 'asset-queue-manager' ),
+					'no_src'			=> __( 'This asset handle calls its dependent assets but loads no source files itself.', 'asset-queue-manager' ),
+					'requeued'			=> __( 'This asset is no longer being dequeued. Reload the page to view where it is enqueued.', 'asset-queue-manager' ),
+					'deps'				=> __( 'Dependencies:', 'asset-queue-manager' ),
+					'dequeue'			=> __( 'Dequeue Asset', 'asset-queue-manager' ),
+					'enqueue'			=> __( 'Stop Dequeuing Asset', 'asset-queue-manager' ),
+					'view'				=> __( 'View Asset', 'asset-queue-manager' ),
+					'sending'			=> __( 'Sending Request', 'asset-queue-manager' ),
+					'unknown_error' 	=> __( 'There was an unknown error with this request. Sorry.', 'asset-queue-manager' )
+				),
+			)
+		);
 	}
 
 	/**
@@ -231,7 +275,7 @@ class aqmInit {
 
 		$wp_admin_bar->add_menu(
 			array(
-				'id'     => 'queue-master',
+				'id'     => 'asset-queue-manager',
 				'parent' => 'top-secondary',
 				'title'  => __( 'Assets', 'asset-queue-manager' ),
 			)
@@ -249,7 +293,7 @@ class aqmInit {
 		// Add dequeued assets to the $assets array
 		$this->get_dequeued_assets();
 
-		$aqm = array(
+		$data = array(
 			'assets'	=> $this->assets,
 			'notices'	=> $this->get_notices(),
 		);
@@ -258,7 +302,7 @@ class aqmInit {
 
 <script type='text/javascript'>
 	/* <![CDATA[ */
-	var aqm_data = <?php echo json_encode( $aqm ); ?>
+	var aqmData = <?php echo json_encode( $data ); ?>
 	/* ]]> */
 </script>
 
@@ -277,7 +321,7 @@ class aqmInit {
 				'handles'	=> array(
 					'jquery',
 					'jquery-core',
-					'jquery-migrate'
+					'jquery-migrate',
 				),
 			),
 			'adminbar'	=> array(
@@ -285,9 +329,15 @@ class aqmInit {
 				'handles'	=> array(
 					'open-sans',
 					'dashicons',
-					'admin-bar'
+					'admin-bar',
 				),
-			)
+			),
+			'self'		=> array(
+				'msg'		=> __( 'This asset is loaded by Asset Queue Manager. It will only be loaded for admin users and dequeuing it will prevent you from managing other assets.', 'asset-queue-manager' ),
+				'handles'	=> array(
+					'asset-queue-manager',
+				)
+			),
 		);
 
 		return apply_filters( 'aqm_notices', $notices );

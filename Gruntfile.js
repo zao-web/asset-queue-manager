@@ -36,9 +36,9 @@ module.exports = function(grunt) {
 		concat: {
 			build: {
 				files: {
-					'assets/js/admin-bar.js': [
-						'assets/src/js/admin-bar.js',
-						'assets/src/js/admin-bar-*.js'
+					'assets/js/aqm.js': [
+						'assets/src/js/aqm.js',
+						'assets/src/js/aqm-panel.js'
 					]
 				}
 			}
@@ -51,7 +51,7 @@ module.exports = function(grunt) {
 			},
 			build: {
 				files: {
-					'assets/js/admin-bar.min.js' : 'assets/js/admin-bar.js'
+					'assets/js/aqm.min.js' : 'assets/js/aqm.js'
 				}
 			}
 		},
