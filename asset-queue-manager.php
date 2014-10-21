@@ -76,8 +76,9 @@ class aqmInit {
 		// Textdomain
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 
-		// @todo Add the ajax hooks which need to be available with
-		// every page call
+		// Handle queue management requests via Ajax
+		add_action( 'wp_ajax_nopriv_aqm-modify-asset' , array( $this , 'ajax_nopriv_default' ) );
+		add_action( 'wp_ajax_aqm-modify-asset', array( $this, 'ajax_modify_asset' ) );
 
 		// Add the rest of the hooks which are only needed when the
 		// admin bar is showing
@@ -208,6 +209,30 @@ class aqmInit {
 		}
 
 		return $this->assets['dequeued'];
+	}
+
+	/**
+	 * Handle all ajax requests from logged out users
+	 * @since 0.0.1
+	 */
+	public function ajax_nopriv_default() {
+
+		wp_send_json_error(
+			array(
+				'error' => 'loggedout',
+				'msg' => __( 'You have been logged out. Please login again to perform this request.', 'asset-queue-manager' ),
+			)
+		);
+	}
+
+	/**
+	 * Handle ajax request to dequeue or re-enqueue an asset
+	 * @since 0.0.1
+	 */
+	public function ajax_modify_asset() {
+
+		// @todo
+
 	}
 
 }
