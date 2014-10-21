@@ -80,9 +80,6 @@ class aqmInit {
 		add_action( 'wp_ajax_nopriv_aqm-modify-asset' , array( $this , 'ajax_nopriv_default' ) );
 		add_action( 'wp_ajax_aqm-modify-asset', array( $this, 'ajax_modify_asset' ) );
 
-		// Add the Assets item to the admin bar
-		add_action( 'admin_bar_menu', array( &$this, 'admin_bar_menu' ) );
-
 		// Add the rest of the hooks which are only needed when the
 		// admin bar is showing
 		add_action( 'admin_bar_init', array( $this, 'admin_bar_init' ) );
@@ -104,6 +101,9 @@ class aqmInit {
 
 		// Store any new assets enqueued in the footer
 		add_action( 'wp_footer', array( $this, 'store_footer_assets' ), 1000 );
+
+		// Add the Assets item to the admin bar
+		add_action( 'admin_bar_menu', array( &$this, 'admin_bar_menu' ) );
 	}
 
 	/**
