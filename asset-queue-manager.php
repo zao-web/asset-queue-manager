@@ -103,7 +103,10 @@ class aqmInit {
 		add_action( 'wp_footer', array( $this, 'store_footer_assets' ), 1000 );
 
 		// Add the Assets item to the admin bar
-		add_action( 'admin_bar_menu', array( &$this, 'admin_bar_menu' ) );
+		add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ) );
+
+		// Pass the assets array to the script
+		add_action( 'wp_footer', array( $this, 'deliver_data' ), 1000 );
 	}
 
 	/**
@@ -233,6 +236,61 @@ class aqmInit {
 				'title'  => __( 'Assets', 'asset-queue-manager' ),
 			)
 		);
+	}
+
+	/**
+	 * Pass the assets array to the script for loading. We can't use
+	 * wp_localize_script() because this has to come after the last
+	 * enqueue opportunity.
+	 * @since 0.0.1
+	 */
+	public function deliver_data() {
+
+		// Add dequeued assets to the $assets array
+		$this->get_dequeued_assets();
+
+		$aqm = array(
+			'assets'	=> $this->assets,
+			'notices'	=> $this->get_notices(),
+		);
+
+		?>
+
+<script type='text/javascript'>
+	/* <![CDATA[ */
+	var aqm_data = <?php echo json_encode( $aqm ); ?>
+	/* ]]> */
+</script>
+
+		<?php
+	}
+
+	/**
+	 * Define the notices and warnings to display for special assets
+	 * @since 0.0.1
+	 */
+	public function get_notices() {
+
+		$notices = array(
+			'core'	=> array(
+				'msg'		=> __( 'This asset is part of WordPress core. Dequeuing this asset could cause serious problems, including breaking the admin bar.', 'asset-queue-manager' ),
+				'handles'	=> array(
+					'jquery',
+					'jquery-core',
+					'jquery-migrate'
+				),
+			),
+			'adminbar'	=> array(
+				'msg'		=> __( 'This asset is commonly loaded with the admin bar for logged in users. It may not be loaded when logged-out users visit this page. Dequeuing this asset could break the admin bar, including this asset manager.', 'asset-queue-manager' ),
+				'handles'	=> array(
+					'open-sans',
+					'dashicons',
+					'admin-bar'
+				),
+			)
+		);
+
+		return apply_filters( 'aqm_notices', $notices );
 	}
 
 	/**
