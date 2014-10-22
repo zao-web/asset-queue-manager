@@ -108,7 +108,7 @@ jQuery(document).ready(function ($) {
 				html += '<a href="#" class="dequeue">' + aqm.strings.dequeue + '</a>';
 
 				var url = this.getAssetURL( asset );
-				if ( url !== false ) {
+				if ( url !== 'false' ) {
 					html += '<a href="' + this.getAssetURL( asset ) + '" target="_blank" class="view">' + aqm.strings.view + '</a>';
 				}
 
