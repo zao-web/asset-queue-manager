@@ -17,19 +17,14 @@ jQuery(document).ready(function ($) {
 
 	aqmPanel = {
 
-		// Admin bar nav menu item
-		admin_bar_el : $( '#wp-admin-bar-asset-queue-manager' ),
+		// Management panel element
+		el : $( '#aqm-panel' ),
+
+		// Menu element in the admin bar
+		menu_el : $( '#wp-admin-bar-asset-queue-manager' ),
 
 		// Add the management panel
 		init : function() {
-
-			// Create the containing div
-			var el = document.createElement( 'div' );
-			el.id = 'aqm-panel';
-			document.body.appendChild( el );
-
-			// Store a jQuery object of the element
-			this.el = $( '#' + el.id );
 
 			// Build the initial assets panel
 			this.el.html(
@@ -51,7 +46,7 @@ jQuery(document).ready(function ($) {
 						aqm.strings.footer_scripts +
 					'</h3>' +
 				'</div>' +
-				'<div class="section head styles">' +
+				'<div class="section footer styles">' +
 					'<h3>' +
 						'<div class="dashicons dashicons-admin-appearance"></div>' +
 						aqm.strings.footer_styles +
@@ -80,18 +75,28 @@ jQuery(document).ready(function ($) {
 				}
 			}
 
+			// Register open/close clicks on the whole panel
+			this.menu_el.click( function() {
+				aqmPanel.toggle();
+			});
+
 		},
 
 		// Add an asset to the panel
 		appendAsset : function( asset, loc, type ) {
 
-			var html = '<div class="asset handle-' + asset.handle + ' ' + type + '" data-type="' + type + '" data-handle="' + asset.handle + '">' +
+			var html = '<div class="asset handle-' + asset.handle + ' ' + type + '" data-type="' + type + '" data-handle="' + asset.handle + '" data-location="' + loc + '">' +
 				'<div class="header">' +
 					'<div class="handle">' + asset.handle + '</div>' +
 					'<div class="src">' + asset.src + '</div>' +
 					'<div class="dashicons dashicons-arrow-down"></div>' +
 				'</div>' +
 				'<div class="body">';
+
+			// Add input field for quick URL selection
+			if ( asset.src.length ) {
+				html += '<div class="src_input"><input type="text" value="' + asset.src + '" readonly="readonly"></div>';
+			}
 
 			// Add notices
 			html += this.getAssetNotices( asset );
@@ -104,16 +109,15 @@ jQuery(document).ready(function ($) {
 			// Add action links
 			html += '<div class="links">';
 
-			if ( loc !== 'dequeued' ) {
-				html += '<a href="#" class="dequeue">' + aqm.strings.dequeue + '</a>';
-
-				var url = this.getAssetURL( asset );
-				if ( url !== 'false' ) {
-					html += '<a href="' + this.getAssetURL( asset ) + '" target="_blank" class="view">' + aqm.strings.view + '</a>';
-				}
-
-			} else {
+			if ( loc === 'dequeued' ) {
 				html += '<a href="#" class="enqueue">' + aqm.strings.enqueue + '</a>';
+			} else {
+				html += '<a href="#" class="dequeue">' + aqm.strings.dequeue + '</a>';
+			}
+
+			var url = this.getAssetURL( asset );
+			if ( url !== 'false' ) {
+				html += '<a href="' + this.getAssetURL( asset ) + '" target="_blank" class="view">' + aqm.strings.view + '</a>';
 			}
 
 			html += '</div>'; // .links
@@ -121,6 +125,33 @@ jQuery(document).ready(function ($) {
 			html += '</div>'; // .asset
 
 			this.el.find( '.section.' + loc + '.' + type ).append( html );
+
+			var cur = this.el.find( '.asset.handle-' + asset.handle + '.' + type );
+
+			// Register click function to open/close asset panel
+			cur.click( function() {
+				aqmPanel.toggleAsset( $(this) );
+			});
+
+			// Register click function to select all in disabled source input field
+			this.enableSrcSelect( cur.find( '.src_input input' ) );
+
+			// Register click function to dequeue/re-enqueue asset
+			cur.find( '.links .dequeue, .links .enqueue' ).click( function(e) {
+				e.stopPropagation();
+				e.preventDefault();
+
+				// Bail early if we've already sent a request
+				if ( $(this).hasClass( 'sending' ) ) {
+					return;
+				}
+
+				$(this).addClass( 'sending' );
+
+				var asset = $(this).parents( '.asset' );
+
+				aqmPanel.toggleQueueState( asset.data( 'handle' ), asset.data( 'location' ), asset.data( 'type' ), $(this).hasClass( 'dequeue' ) );
+			});
 
 		},
 
@@ -131,7 +162,7 @@ jQuery(document).ready(function ($) {
 
 			for ( var notice in aqmData.notices ) {
 				for ( var handle in aqmData.notices[notice].handles ) {
-					if ( handle === asset.handle ) {
+					if ( aqmData.notices[notice].handles[handle] === asset ) {
 						notices += '<p class="notice ' + notice + '">' + aqmData.notices[notice].msg + '</p>';
 					}
 				}
@@ -158,6 +189,73 @@ jQuery(document).ready(function ($) {
 			}
 
 			return url;
+		},
+
+		// Open/close the panel
+		toggle : function() {
+
+			if ( this.menu_el.hasClass( 'open' ) ) {
+				this.el.slideUp();
+				this.el.removeClass( 'open' );
+				this.menu_el.removeClass( 'open' );
+			} else {
+				this.el.addClass( 'open' );
+				this.menu_el.addClass( 'open' );
+				this.el.slideDown();
+			}
+		},
+
+		// Open/close an asset panel
+		toggleAsset : function( asset ) {
+
+			if ( asset.hasClass( 'open' ) ) {
+				asset.removeClass( 'open' );
+			} else {
+				asset.addClass( 'open' );
+			}
+		},
+
+		// Enable the auto-selection in the source field
+		enableSrcSelect : function( el ) {
+
+			// Don't bubble up to the open/close asset toggle
+			el.click( function(e) {
+				e.stopPropagation();
+			});
+
+			el.click( function() {
+				this.select();
+			});
+		},
+
+		// Send an Ajax request to dequeue or re-enqueue an asset
+		toggleQueueState : function( handle, location, type, dequeue ) {
+
+			var asset = this.el.find( '.asset.handle-' + handle + '.' + type );
+
+			asset.find( '.body' ).append( '<p class="notice request">' + aqm.strings.sending + '</p>' );
+
+			asset_data = aqmData.assets[location][type][handle];
+
+			var data = $.param({
+				action: 'aqm-modify-asset',
+				nonce: aqm.nonce,
+				handle: handle,
+				type: type,
+				dequeue: dequeue,
+				asset_data: asset_data
+			});
+
+			var jqxhr = $.post( aqm.ajaxurl, data, function( r ) {
+
+				console.log( r );
+
+				asset.find( '.links .sending' ).removeClass( 'sending' );
+				asset.find( '.notice.request' ).slideUp( null, function() {
+					$(this).remove();
+				});
+			});
+
 		}
 	};
 

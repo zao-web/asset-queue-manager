@@ -108,8 +108,8 @@ class aqmInit {
 		// Add the Assets item to the admin bar
 		add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ) );
 
-		// Pass the assets array to the script
-		add_action( 'wp_footer', array( $this, 'deliver_data' ), 1000 );
+		// Print the assets panel in the footer
+		add_action( 'wp_footer', array( $this, 'print_assets_panel' ), 1000 );
 	}
 
 	/**
@@ -137,6 +137,8 @@ class aqmInit {
 	 */
 	public function register_assets() {
 
+		wp_enqueue_style( 'asset-queue-manager', self::$plugin_url . '/assets/css/aqm.css' );
+
 		// Load unminified scripts in debug mode
 		if ( WP_DEBUG ) {
 			wp_enqueue_script( 'asset-queue-manager', self::$plugin_url . '/assets/js/aqm.js', array( 'jquery' ), '', true );
@@ -163,7 +165,7 @@ class aqmInit {
 					'requeued'			=> __( 'This asset is no longer being dequeued. Reload the page to view where it is enqueued.', 'asset-queue-manager' ),
 					'deps'				=> __( 'Dependencies:', 'asset-queue-manager' ),
 					'dequeue'			=> __( 'Dequeue Asset', 'asset-queue-manager' ),
-					'enqueue'			=> __( 'Stop Dequeuing Asset', 'asset-queue-manager' ),
+					'enqueue'			=> __( 'Stop Dequeuing', 'asset-queue-manager' ),
 					'view'				=> __( 'View Asset', 'asset-queue-manager' ),
 					'sending'			=> __( 'Sending Request', 'asset-queue-manager' ),
 					'unknown_error' 	=> __( 'There was an unknown error with this request. Sorry.', 'asset-queue-manager' )
@@ -283,12 +285,12 @@ class aqmInit {
 	}
 
 	/**
-	 * Pass the assets array to the script for loading. We can't use
-	 * wp_localize_script() because this has to come after the last
-	 * enqueue opportunity.
+	 * Print the assets panel and pass the assets array to the script
+	 * for loading. We can't use wp_localize_script() because this has
+	 * to come after the last enqueue opportunity.
 	 * @since 0.0.1
 	 */
-	public function deliver_data() {
+	public function print_assets_panel() {
 
 		// Add dequeued assets to the $assets array
 		$this->get_dequeued_assets();
@@ -299,6 +301,12 @@ class aqmInit {
 		);
 
 		?>
+
+<div id="aqm-panel">
+	<p>
+		<?php printf( __( 'If you are seeing this panel, it may be because jQuery is not being loaded on the page. jQuery is required for the Asset Queue Manager to work. If you have encountered this error after dequeuing an asset by mistake, you can %srestore all assets%s dequeued by Asset Queue Manager. This message is only shown to administrators.', 'asset-queue-manager' ), '<a href="' . get_bloginfo( 'url' ) . '?aqm=restore">', '</a>' ); ?>
+	</p>
+</div>
 
 <script type='text/javascript'>
 	/* <![CDATA[ */
@@ -363,7 +371,82 @@ class aqmInit {
 	 */
 	public function ajax_modify_asset() {
 
-		// @todo
+		if ( !check_ajax_referer( 'asset-queue-manager', 'nonce' ) ||  !is_super_admin() ) {
+			$this->ajax_nopriv_default();
+		}
+
+		if ( empty( $_POST['handle'] ) || empty( $_POST['type'] ) || empty( $_POST['asset_data'] ) ) {
+			wp_send_json_error(
+				array(
+					'error' => 'noasset',
+					'msg' => __( 'There was an error with this dequeue request. No asset information was passed.', 'asset-queue-manager' ),
+					'post'	=> $_POST
+				)
+			);
+		}
+
+
+		if ( $_POST['type'] !== 'scripts' && $_POST['type'] !== 'styles' ) {
+			wp_send_json_error(
+				array(
+					'error' => 'badtype',
+					'msg' => __( 'There was an error with this dequeue request. The asset type was not recognized.', 'asset-queue-manager' ),
+					'post'	=> $_POST
+				)
+			);
+		}
+		
+		$handle = sanitize_key( $_POST['handle'] );
+		$type = sanitize_key( $_POST['type'] );
+
+		$this->get_dequeued_assets();
+
+		// Initialize the array if nothing's been dequeued yet
+		if ( empty( $this->assets['dequeued'][ $type ] ) ) {
+			$this->assets['dequeued'][ $type ] = array();
+		}
+
+		// Handle dequeue request
+		if ( $_POST['dequeue'] === 'true' ) {
+
+			if ( in_array( $handle, $this->assets['dequeued'][ $type ] ) ) {
+				wp_send_json_error(
+					array(
+						'error' => 'alreadydequeued',
+						'msg' => __( 'This asset has already been dequeued. If the asset is still being loaded, the author may not have properly enqueued the asset using the wp_enqueue_* functions.', 'asset-queue-manager' ),
+					)
+				);
+			}
+
+			$this->assets['dequeued'][ $type ][ $handle ] = $_POST['asset_data'];
+
+			update_option( 'aqm-dequeued', $this->assets['dequeued'] );
+		
+			wp_send_json_success(
+				array(
+					'type' => $type,
+					'asset' => $handle,
+					'option' => $this->assets['dequeued'],
+					'dequeue' => true
+				)
+			);
+
+		// Handle enqueue request
+		} else {
+
+			unset( $this->assets['dequeued'][ $type ][ $handle ] );
+
+			update_option( 'aqm-dequeued', $this->assets['dequeued'] );
+			
+			wp_send_json_success(
+				array(
+					'type' => $type,
+					'asset' => $handle,
+					'option' => $this->assets['dequeued'],
+					'dequeue' => false
+				)
+			);
+		}
 
 	}
 

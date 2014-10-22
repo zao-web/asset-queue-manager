@@ -17,9 +17,8 @@ module.exports = function(grunt) {
 					ieCompat: true
 				},
 				files: {
-					'assets/css/admin-bar.css': [
-						'assets/src/less/admin-bar.less',
-						'assets/src/less/admin-bar-*.less'
+					'assets/css/aqm.css': [
+						'assets/src/less/aqm.less'
 					]
 				}
 			}
@@ -51,7 +50,7 @@ module.exports = function(grunt) {
 			},
 			build: {
 				files: {
-					'assets/js/aqm.min.js' : 'assets/js/aqm.js'
+					'assets/js/aqm.min.js' : 'assets/js/aqm.js',
 				}
 			}
 		},

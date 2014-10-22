@@ -1,0 +1,172 @@
+//
+// Asset Queue Manager
+//
+// Styles for the management panel attached to the admin bar
+//
+
+@bg:				#333;
+@bg-panel:			#ddd;
+@bg-lift:			#fff;
+@primary:			#2ea2cc;
+@offset:			#d64e07;
+@text:				#222;
+@text-shade:		#777;
+@wob:				#fff;
+
+#wp-admin-bar-asset-queue-manager {
+	cursor: pointer;
+	cursor: hand;
+
+	&.open {
+		background: @bg;
+	}
+}
+
+#aqm-panel {
+	display: none;
+	position: absolute;
+	top: 32px;
+	width: 100%;
+	background: @bg;
+	color: @wob;
+	z-index: 99998; /* just under the admin bar */
+
+	&.open {
+		padding: 1em 0;
+	}
+
+	h3 {
+		font-size: 100%;
+		padding-left: 1em;
+
+		.dashicons {
+			margin-right: 0.25em;
+			color: @primary;
+		}
+	}
+
+	.dequeued h3 .dashicons {
+		color: @offset;
+	}
+
+	.asset {
+		width: 20em;
+		display: inline-block;
+		position: relative;
+		background: @bg-panel;
+		vertical-align: top;
+		margin-left: 1em;
+		margin-top: 2em;
+		padding: 0.5em;
+		border-bottom: 4px solid @primary;
+		overflow: hidden;
+		color: @text;
+
+		&.open {
+			overflow: initial;
+
+			.body,
+			.src_input {
+				display: block;
+			}
+
+			.src {
+				display: none;
+			}
+
+			&:hover,
+			&:active {
+				background: @bg-panel;
+			}
+		}
+
+		&:hover,
+		&:active {
+			background: #bbb;
+			cursor: pointer;
+			cursor: hand;
+
+			.dashicons {
+				display: block;
+			}
+		}
+
+		.dashicons {
+			display: none;
+			position: absolute;
+			top: 0.5em;
+			right: 0.5em;
+		}
+	}
+
+	.handle {
+		font-family: monospace;
+		font-size: 1.2em;
+	}
+
+	.src {
+		color: @text-shade;
+		white-space: nowrap;
+		font-size: 85%;
+	}
+
+	.src_input {
+		display: none;
+		margin: 1em 0;
+
+		input {
+			font-size: 85%;
+			padding: 0.5em;
+			width: 100%;
+			border: 1px solid #bbb;
+			background: #ccc;
+			border-radius: 5px;
+		}
+	}
+
+	.section.dequeued .asset {
+		border-color: @offset;
+	}
+
+	.body {
+		display: none;
+	}
+
+	.notice {
+		margin-top: 1em;
+		padding: 0.5em 1em;
+		background: @bg-lift;
+		border-left: 4px solid @primary;
+		font-size: 85%;
+	}
+
+	.deps {
+		font-size: 85%;
+	}
+
+	.links {
+
+		a {
+			background: @primary;
+			color: @wob;
+			display: inline-block;
+			position: relative;
+			border: 1px solid @primary;
+			margin-right: 1em;
+			padding: 0.5em 1em;
+			border-bottom: 2px solid darken( @primary, 15% );
+			border-radius: 5px;
+
+			&:hover,
+			&:focus {
+				background: @offset;
+				border-color: darken( @offset, 15% );
+			}
+
+			&:active {
+				top: 1px;
+				border-bottom: 1px solid darken( @offset, 15% );
+			}
+		}
+	}
+}
