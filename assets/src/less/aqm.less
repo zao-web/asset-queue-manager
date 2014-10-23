@@ -30,6 +30,7 @@
 	background: @bg;
 	color: @wob;
 	z-index: 99998; /* just under the admin bar */
+	font: 400 13px/24px "Open Sans",sans-serif; /* Mimic the WP admin bar */
 
 	&.open {
 		padding: 1em 0;
@@ -107,7 +108,6 @@
 	.src {
 		color: @text-shade;
 		white-space: nowrap;
-		font-size: 85%;
 	}
 
 	.src_input {
@@ -115,12 +115,13 @@
 		margin: 1em 0;
 
 		input {
-			font-size: 85%;
 			padding: 0.5em;
 			width: 100%;
 			border: 1px solid #bbb;
 			background: #ccc;
+			color: @text;
 			border-radius: 5px;
+			box-sizing: border-box;
 		}
 	}
 
@@ -137,11 +138,6 @@
 		padding: 0.5em 1em;
 		background: @bg-lift;
 		border-left: 4px solid @primary;
-		font-size: 85%;
-	}
-
-	.deps {
-		font-size: 85%;
 	}
 
 	.links {
@@ -156,6 +152,7 @@
 			padding: 0.5em 1em;
 			border-bottom: 2px solid darken( @primary, 15% );
 			border-radius: 5px;
+			text-decoration: none;
 
 			&:hover,
 			&:focus {
