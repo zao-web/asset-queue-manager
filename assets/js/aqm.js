@@ -162,7 +162,7 @@ jQuery(document).ready(function ($) {
 
 			for ( var notice in aqmData.notices ) {
 				for ( var handle in aqmData.notices[notice].handles ) {
-					if ( aqmData.notices[notice].handles[handle] === asset ) {
+					if ( aqmData.notices[notice].handles[handle] === asset.handle ) {
 						notices += '<p class="notice ' + notice + '">' + aqmData.notices[notice].msg + '</p>';
 					}
 				}
