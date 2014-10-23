@@ -105,6 +105,10 @@ class aqmInit {
 		// Store any new assets enqueued in the footer
 		add_action( 'wp_footer', array( $this, 'store_footer_assets' ), 1000 );
 
+		// Deregister assets
+		add_action( 'wp_head', array( $this, 'deregister_assets' ), 7 );
+		add_action( 'wp_footer', array( $this, 'deregister_assets' ) );
+
 		// Add the Assets item to the admin bar
 		add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ) );
 
@@ -261,6 +265,28 @@ class aqmInit {
 		}
 
 		return $this->assets['dequeued'];
+	}
+
+	/**
+	 * Deregister all dequeued assets. This should be called before
+	 * wp_head and wp_footer.
+	 * @since 0.0.1
+	 */
+	public function deregister_assets() {
+
+		$this->get_dequeued_assets();
+		
+		if ( !empty( $this->assets['dequeued']['scripts'] ) ) {
+			foreach( $this->assets['dequeued']['scripts'] as $handle => $asset ) {
+				wp_deregister_script( $handle );
+			}
+		}
+
+		if ( !empty( $this->assets['dequeued']['styles'] ) ) {
+			foreach( $this->assets['dequeued']['styles'] as $handle => $asset ) {
+				wp_deregister_style( $handle );
+			}
+		}
 	}
 
 	/**
@@ -425,7 +451,7 @@ class aqmInit {
 			wp_send_json_success(
 				array(
 					'type' => $type,
-					'asset' => $handle,
+					'handle' => $handle,
 					'option' => $this->assets['dequeued'],
 					'dequeue' => true
 				)
@@ -441,7 +467,7 @@ class aqmInit {
 			wp_send_json_success(
 				array(
 					'type' => $type,
-					'asset' => $handle,
+					'handle' => $handle,
 					'option' => $this->assets['dequeued'],
 					'dequeue' => false
 				)

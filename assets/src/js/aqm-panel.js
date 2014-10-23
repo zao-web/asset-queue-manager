@@ -94,7 +94,7 @@ jQuery(document).ready(function ($) {
 				'<div class="body">';
 
 			// Add input field for quick URL selection
-			if ( asset.src.length ) {
+			if ( typeof asset.src !== 'undefined' && asset.src.length ) {
 				html += '<div class="src_input"><input type="text" value="' + asset.src + '" readonly="readonly"></div>';
 			}
 
@@ -102,7 +102,7 @@ jQuery(document).ready(function ($) {
 			html += this.getAssetNotices( asset );
 			
 			// Add dependencies
-			if ( asset.deps.length ) {
+			if ( typeof asset.deps !== 'undefined' && asset.deps.length ) {
 				html += '<p class="deps"><strong>' + aqm.strings.deps + '</strong> ' + asset.deps.join( ', ' ) + '</p>';
 			}
 
@@ -233,9 +233,8 @@ jQuery(document).ready(function ($) {
 
 			var asset = this.el.find( '.asset.handle-' + handle + '.' + type );
 
-			asset.find( '.body' ).append( '<p class="notice request">' + aqm.strings.sending + '</p>' );
-
-			asset_data = aqmData.assets[location][type][handle];
+			asset.find( '.body .notice.request' ).remove();
+			asset.find( '.body' ).append( '<p class="notice request"><span class="spinner"></span>' + aqm.strings.sending + '</p>' );
 
 			var data = $.param({
 				action: 'aqm-modify-asset',
@@ -243,23 +242,61 @@ jQuery(document).ready(function ($) {
 				handle: handle,
 				type: type,
 				dequeue: dequeue,
-				asset_data: asset_data
+				asset_data: aqmData.assets[location][type][handle]
 			});
 
 			var jqxhr = $.post( aqm.ajaxurl, data, function( r ) {
 
-				console.log( r );
+				var notice = asset.find( '.notice.request' );
+
+				if ( r.success ) {
+
+					// If we got a successful return but no data,
+					// something's gone wonky.
+					if ( typeof r.data == 'undefined' ) {
+						notice.addClass( 'error' ).text( aqm.strings.unknown_error );
+						console.log( r );
+
+						return;
+					}
+
+					notice.slideUp( null, function() {
+						$(this).remove();
+					});
+
+					if ( r.data.dequeue ) {
+						asset.fadeOut( null, function() {
+							$(this).remove();
+						});
+						
+						aqmPanel.appendAsset( r.data.option[r.data.type][r.data.handle], 'dequeued', r.data.type );
+
+						// Add this the array of dequeued assets so
+						// the data can be retrieved if they want to
+						// stop dequeuing it. Ideally we'd also remove
+						// the asset data from the enqueued asset arrays
+						// but this will do for now.
+						aqmData.assets.dequeued[type][r.data.handle] = aqmData.assets[location][type][handle];
+
+					} else {
+						asset.addClass( 'requeued' ).find( '.body' ).empty().append( '<p class="notice requeued">' + aqm.strings.requeued + '</p>' );
+					}
+
+				} else {
+					
+					if ( typeof r.data == 'undefined' || typeof r.data.msg == 'undefined' ) {
+						notice.addClass( 'error' ).text( aqm.strings.unknown_error );
+					} else {
+						notice.addClass( 'error' ).text( r.data.msg );
+					}
+				}
 
 				asset.find( '.links .sending' ).removeClass( 'sending' );
-				asset.find( '.notice.request' ).slideUp( null, function() {
-					$(this).remove();
-				});
+
 			});
 
 		}
 	};
-
-	console.log( aqmData );
 
 	aqmPanel.init();
 

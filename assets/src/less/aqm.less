@@ -129,15 +129,26 @@
 		border-color: @offset;
 	}
 
+	.section .asset.requeued {
+		opacity: 0.5;
+		border-color: @primary;
+	}
+
 	.body {
 		display: none;
 	}
 
 	.notice {
+		line-height: 18px;
 		margin-top: 1em;
 		padding: 0.5em 1em;
 		background: @bg-lift;
 		border-left: 4px solid @primary;
+
+		&.request,
+		&.requeued {
+			margin-bottom: 0;
+		}
 	}
 
 	.links {
@@ -166,4 +177,88 @@
 			}
 		}
 	}
+}
+
+//
+// Spinner Animation
+//
+// Thanks Mikhail Proniushkin
+// http://codepen.io/mikepro4/
+//
+#aqm-panel {
+
+	.notice {
+
+		&.request {
+			height: 18px;
+
+			.spinner {
+				display: inline-block;
+				line-height: 18px;
+				vertical-align: middle;
+				margin-right: 0.5em;
+
+				&:after {
+					display: inline-block;
+					position: relative;
+					width: 16px;
+					height: 16px;
+					-webkit-animation: aqmrotate .6s linear infinite;
+					-moz-animation: aqmrotate .6s linear infinite;
+					-ms-animation: aqmrotate .6s linear infinite;
+					-o-animation: aqmrotate .6s linear infinite;
+					animation: aqmrotate .6s linear infinite;
+					border-radius: 100%;
+					border-top: 1px solid #545a6a;
+					border-bottom: 1px solid #d4d4db;
+					border-left: 1px solid #545a6a;
+					border-right: 1px solid #d4d4db;
+					content: '';
+					opacity: .5;
+				}
+			}
+		}
+	}
+}
+.transform (@transform) {
+	transform: @transform;
+	-webkit-transform: @transform;
+	-moz-transform: @transform;
+	-o-transform: @transform;
+}
+
+@keyframes aqmrotate {
+  0% {
+    .transform(rotateZ(-360deg));
+  }
+  100% {
+    .transform(rotateZ(0deg));
+  }
+}
+
+@-webkit-keyframes aqmrotate {
+  0% {
+    .transform(rotateZ(-360deg));
+  }
+  100% {
+    .transform(rotateZ(0deg));
+  }
+}
+
+@-moz-keyframes aqmrotate {
+  0% {
+    .transform(rotateZ(-360deg));
+  }
+  100% {
+    .transform(rotateZ(0deg));
+  }
+}
+
+@-o-keyframes aqmrotate {
+  0% {
+    .transform(rotateZ(-360deg));
+  }
+  100% {
+    .transform(rotateZ(0deg));
+  }
 }
