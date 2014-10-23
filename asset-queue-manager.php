@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Asset Queue Manager
- * Plugin URI: http://themeofthecrop.com
+ * Plugin URI: https://github.com/NateWr
  * Description: A tool for front-end experts to take control of all scripts and styles enqueued on their site.
  * Version: 0.0.1
- * Author: Theme of the Crop
- * Author URI: http://themeofthecrop.com
+ * Author: Nate Wright
+ * Author URI: https://github.com/NateWr
  * License:     GNU General Public License v2.0 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
