@@ -52,13 +52,13 @@ jQuery(document).ready(function ($) {
 						aqm.strings.footer_styles +
 					'</h3>' +
 				'</div>' +
-				'<div class="section dequeued styles">' +
+				'<div class="section dequeued scripts">' +
 					'<h3>' +
 						'<div class="dashicons dashicons-admin-tools"></div>' +
 						aqm.strings.dequeued_scripts +
 					'</h3>' +
 				'</div>' +
-				'<div class="section dequeued scripts">' +
+				'<div class="section dequeued styles">' +
 					'<h3>' +
 						'<div class="dashicons dashicons-admin-appearance"></div>' +
 						aqm.strings.dequeued_styles +
