@@ -14,11 +14,45 @@
 @wob:				#fff;
 
 #wp-admin-bar-asset-queue-manager {
-	cursor: pointer;
-	cursor: hand;
+
+	.ab-item {
+		cursor: pointer;
+		cursor: hand;
+	}
 
 	&.open {
 		background: @bg;
+	}
+
+	&:hover,
+	&:focus {
+
+		.inactive {
+			display: block;
+		}
+	}
+
+	.inactive {
+		display: none;
+		position: fixed;
+		top: 28px;
+		left: 0;
+		width: 100%;
+		background: @bg;
+
+		p {
+			margin: 0;
+			padding: 1em;
+			line-height: 18px;
+		}
+
+		a {
+			display: inline;
+			color: @primary;
+			height: auto;
+			padding: 0;
+			line-height: 18px;
+		}
 	}
 }
 

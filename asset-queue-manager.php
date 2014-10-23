@@ -80,6 +80,9 @@ class aqmInit {
 		add_action( 'wp_ajax_nopriv_aqm-modify-asset' , array( $this , 'ajax_nopriv_default' ) );
 		add_action( 'wp_ajax_aqm-modify-asset', array( $this, 'ajax_modify_asset' ) );
 
+		// Process an emergency restore request
+		add_action( 'init', array( $this, 'restore_queue' ) );
+
 		// Add the rest of the hooks which are only needed when the
 		// admin bar is showing
 		add_action( 'admin_bar_init', array( $this, 'admin_bar_init' ) );
@@ -301,11 +304,16 @@ class aqmInit {
 
 		global $wp_admin_bar;
 
-		$wp_admin_bar->add_menu(
+		$recovery_message = sprintf( __( 'The Asset Queue Manager panel did not load. This can happen if jQuery is not being loaded on the page. If you have encountered this error after dequeuing an asset by mistake, you can %srestore all assets%s dequeued by Asset Queue Manager. This message is only shown to administrators.', 'asset-queue-manager' ), '<a href="' . admin_url() . '?aqm=restore">', '</a>' );
+
+		$wp_admin_bar->add_node(
 			array(
-				'id'     => 'asset-queue-manager',
-				'parent' => 'top-secondary',
-				'title'  => __( 'Assets', 'asset-queue-manager' ),
+				'id'     	=> 'asset-queue-manager',
+				'parent'	=> 'top-secondary',
+				'title'  	=> __( 'Assets', 'asset-queue-manager' ),
+				'meta'		=> array(
+					'html'	=> '<div class="inactive"><p>' . $recovery_message . '</p></div>'
+				)
 			)
 		);
 	}
@@ -328,12 +336,7 @@ class aqmInit {
 
 		?>
 
-<div id="aqm-panel">
-	<p>
-		<?php printf( __( 'If you are seeing this panel, it may be because jQuery is not being loaded on the page. jQuery is required for the Asset Queue Manager to work. If you have encountered this error after dequeuing an asset by mistake, you can %srestore all assets%s dequeued by Asset Queue Manager. This message is only shown to administrators.', 'asset-queue-manager' ), '<a href="' . get_bloginfo( 'url' ) . '?aqm=restore">', '</a>' ); ?>
-	</p>
-</div>
-
+<div id="aqm-panel" class="inactive"></div>
 <script type='text/javascript'>
 	/* <![CDATA[ */
 	var aqmData = <?php echo json_encode( $data ); ?>
@@ -473,7 +476,24 @@ class aqmInit {
 				)
 			);
 		}
+	}
 
+	/**
+	 * Delete dequeue option so that no assets are being blocked
+	 * 
+	 * This is an emergency restore function in case people get
+	 * themselves into a bit of a bind. Don't want them to have to get
+	 * into the database to do this.
+	 * 
+	 * @since 0.0.1
+	 */
+	public function restore_queue() {
+
+		if ( empty( $_REQUEST['aqm'] ) || $_REQUEST['aqm'] !== 'restore' || !is_super_admin() ) {
+			return;
+		}
+
+		delete_option( 'aqm-dequeued' );
 	}
 
 }

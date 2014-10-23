@@ -80,6 +80,9 @@ jQuery(document).ready(function ($) {
 				aqmPanel.toggle();
 			});
 
+			// Remove the emergency fallback panel
+			this.menu_el.find( '.inactive' ).remove();
+
 		},
 
 		// Add an asset to the panel
@@ -276,6 +279,12 @@ jQuery(document).ready(function ($) {
 						// stop dequeuing it. Ideally we'd also remove
 						// the asset data from the enqueued asset arrays
 						// but this will do for now.
+						if ( aqmData.assets.dequeued === false ) {
+							aqmData.assets.dequeued = [];
+						}
+						if ( typeof aqmData.assets.dequeued[type] === 'undefined' ) {
+							aqmData.assets.dequeued[type] = [];
+						}
 						aqmData.assets.dequeued[type][r.data.handle] = aqmData.assets[location][type][handle];
 
 					} else {
@@ -292,7 +301,6 @@ jQuery(document).ready(function ($) {
 				}
 
 				asset.find( '.links .sending' ).removeClass( 'sending' );
-
 			});
 
 		}
