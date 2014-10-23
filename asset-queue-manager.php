@@ -95,7 +95,15 @@ class aqmInit {
 	 */
 	public function admin_bar_init() {
 
-		if ( !is_super_admin() || !is_admin_bar_showing() || $this->is_wp_login() || is_admin() ) {
+		if ( !is_super_admin() || !is_admin_bar_showing() || $this->is_wp_login() ) {
+			return;
+		}
+
+		// Add links to the plugin listing on the installed plugins page
+		add_filter( 'plugin_action_links', array( $this, 'plugin_action_links' ), 10, 2);
+
+		// Don't bother showing the panel in the admin area
+		if ( is_admin() ) {
 			return;
 		}
 
@@ -494,6 +502,20 @@ class aqmInit {
 		}
 
 		delete_option( 'aqm-dequeued' );
+	}
+
+	/**
+	 * Add links to the plugin listing on the installed plugins page
+	 * @since 0.0.1
+	 */
+	public function plugin_action_links( $links, $plugin ) {
+
+		if ( $plugin == plugin_basename( __FILE__ ) ) {
+
+			$links['restore'] = '<a href="' . admin_url() . '?aqm=restore" title="' . __( 'Restore any assets dequeued by this plugin.', 'asset-queue-manager' ) . '">' . __( 'Restore Dequeued Assets', 'asset-queue-manager' ) . '</a>';
+		}
+
+		return $links;
 	}
 
 }
