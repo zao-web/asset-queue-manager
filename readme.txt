@@ -13,11 +13,11 @@ A tool for experienced frontend performance engineers to take control over the s
 
 == Description ==
 
-This tool allows you to monitor, dequeue and requeue scripts and styles that are enqueued on your site. It is designed for frontend performance engineers who want to view all assets enqueued on any page and control the minification and concatenation themselves.
+This tool allows you to monitor, dequeue and requeue scripts and styles that are enqueued on your site. It is designed for frontend performance engineers who want to view and manage all assets enqueued on any page and control the minification and concatenation themselves.
 
 For background, please read [Chris Coyier's initial request](https://gist.github.com/chriscoyier/2074e17ce9ae5e6d537e).
 
-*Warning: This plugin makes it easy to break your site. Don't use this unless you know what you're doing.*
+**Warning: This plugin makes it easy to break your site. Don't use this unless you know what you're doing.**
 
 = How to use =
 
