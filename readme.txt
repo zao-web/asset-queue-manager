@@ -3,7 +3,7 @@ Contributors: NateWr
 Author URI: https://github.com/NateWr
 Plugin URL: https://github.com/NateWr/asset-queue-manager
 Requires at Least: 4.0
-Tested Up To: 4.0
+Tested Up To: 4.2
 Tags: developer, tool, debug, development, developer, debugging
 Stable tag: 1.0.0
 License: GPLv2 or later
