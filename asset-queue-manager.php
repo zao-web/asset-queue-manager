@@ -87,6 +87,10 @@ class aqmInit {
 		// admin bar is showing
 		add_action( 'admin_bar_init', array( $this, 'admin_bar_init' ) );
 
+		// Deregister assets
+		add_action( 'wp_head', array( $this, 'deregister_assets' ), 7 );
+		add_action( 'wp_footer', array( $this, 'deregister_assets' ) );
+
 	}
 
 	/**
@@ -115,10 +119,6 @@ class aqmInit {
 
 		// Store any new assets enqueued in the footer
 		add_action( 'wp_footer', array( $this, 'store_footer_assets' ), 1000 );
-
-		// Deregister assets
-		add_action( 'wp_head', array( $this, 'deregister_assets' ), 7 );
-		add_action( 'wp_footer', array( $this, 'deregister_assets' ) );
 
 		// Add the Assets item to the admin bar
 		add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ) );
@@ -194,7 +194,7 @@ class aqmInit {
 	 * @since 0.0.1
 	 */
 	public function store_asset_list( $enqueued_slugs, $asset_data, $location, $type ) {
-		
+
 		foreach( $enqueued_slugs as $slug ) {
 			$this->store_asset( $slug, $asset_data[ $slug ], $location, $type );
 		}
@@ -286,7 +286,7 @@ class aqmInit {
 	public function deregister_assets() {
 
 		$this->get_dequeued_assets();
-		
+
 		if ( !empty( $this->assets['dequeued']['scripts'] ) ) {
 			foreach( $this->assets['dequeued']['scripts'] as $handle => $asset ) {
 				wp_deregister_script( $handle );
@@ -432,7 +432,7 @@ class aqmInit {
 				)
 			);
 		}
-		
+
 		$handle = sanitize_key( $_POST['handle'] );
 		$type = sanitize_key( $_POST['type'] );
 
@@ -458,7 +458,7 @@ class aqmInit {
 			$this->assets['dequeued'][ $type ][ $handle ] = $_POST['asset_data'];
 
 			update_option( 'aqm-dequeued', $this->assets['dequeued'] );
-		
+
 			wp_send_json_success(
 				array(
 					'type' => $type,
@@ -474,7 +474,7 @@ class aqmInit {
 			unset( $this->assets['dequeued'][ $type ][ $handle ] );
 
 			update_option( 'aqm-dequeued', $this->assets['dequeued'] );
-			
+
 			wp_send_json_success(
 				array(
 					'type' => $type,
@@ -488,11 +488,11 @@ class aqmInit {
 
 	/**
 	 * Delete dequeue option so that no assets are being blocked
-	 * 
+	 *
 	 * This is an emergency restore function in case people get
 	 * themselves into a bit of a bind. Don't want them to have to get
 	 * into the database to do this.
-	 * 
+	 *
 	 * @since 0.0.1
 	 */
 	public function restore_queue() {
