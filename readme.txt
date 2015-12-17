@@ -5,7 +5,7 @@ Plugin URL: https://github.com/NateWr/asset-queue-manager
 Requires at Least: 4.0
 Tested Up To: 4.4
 Tags: developer, tool, debug, development, developer, debugging
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 Donate link: http://themeofthecrop.com
 
@@ -45,6 +45,9 @@ Go to the list of plugins in your admin panel. Find the Asset Queue Manager and 
 2. View details about assets that are being dequeued by this plugin. Requeue them or view them for copying and minifying on your own.
 
 == Changelog ==
+
+= 1.0.1 (2014-12-17) =
+* Fix critical bug where assets were only dequeued for logged in users with the admin bar present 
 
 = 1.0 (2014-10-23) =
 * Initial release
