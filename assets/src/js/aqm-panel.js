@@ -129,7 +129,7 @@ jQuery(document).ready(function ($) {
 
 			this.el.find( '.section.' + loc + '.' + type ).append( html );
 
-			var cur = this.el.find( '.asset.handle-' + asset.handle + '.' + type );
+			var cur = this.el.find( '.asset.handle-' + asset.handle.replace(/\./g, "\\.") + '.' + type );
 
 			// Register click function to open/close asset panel
 			cur.click( function() {
