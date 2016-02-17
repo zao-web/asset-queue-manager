@@ -103,7 +103,7 @@ jQuery(document).ready(function ($) {
 
 			// Add notices
 			html += this.getAssetNotices( asset );
-			
+
 			// Add dependencies
 			if ( typeof asset.deps !== 'undefined' && asset.deps.length ) {
 				html += '<p class="deps"><strong>' + aqm.strings.deps + '</strong> ' + asset.deps.join( ', ' ) + '</p>';
@@ -129,7 +129,7 @@ jQuery(document).ready(function ($) {
 
 			this.el.find( '.section.' + loc + '.' + type ).append( html );
 
-			var cur = this.el.find( '.asset.handle-' + asset.handle + '.' + type );
+			var cur = this.el.find( '.asset.handle-' + asset.handle.replace(/\./g, "\\.") + '.' + type );
 
 			// Register click function to open/close asset panel
 			cur.click( function() {
@@ -234,7 +234,7 @@ jQuery(document).ready(function ($) {
 		// Send an Ajax request to dequeue or re-enqueue an asset
 		toggleQueueState : function( handle, location, type, dequeue ) {
 
-			var asset = this.el.find( '.asset.handle-' + handle + '.' + type );
+			var asset = this.el.find( '.asset.handle-' + handle.replace(/\./g, "\\.") + '.' + type );
 
 			asset.find( '.body .notice.request' ).remove();
 			asset.find( '.body' ).append( '<p class="notice request"><span class="spinner"></span>' + aqm.strings.sending + '</p>' );
@@ -271,7 +271,7 @@ jQuery(document).ready(function ($) {
 						asset.fadeOut( null, function() {
 							$(this).remove();
 						});
-						
+
 						aqmPanel.appendAsset( r.data.option[r.data.type][r.data.handle], 'dequeued', r.data.type );
 
 						// Add this the array of dequeued assets so
@@ -292,7 +292,7 @@ jQuery(document).ready(function ($) {
 					}
 
 				} else {
-					
+
 					if ( typeof r.data == 'undefined' || typeof r.data.msg == 'undefined' ) {
 						notice.addClass( 'error' ).text( aqm.strings.unknown_error );
 					} else {
