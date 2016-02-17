@@ -3,7 +3,7 @@
  * Plugin Name: Asset Queue Manager
  * Plugin URI: https://github.com/NateWr/asset-queue-manager
  * Description: A tool for front-end experts to take control of all scripts and styles enqueued on their site.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Nate Wright
  * Author URI: https://github.com/NateWr
  * License:     GNU General Public License v2.0 or later

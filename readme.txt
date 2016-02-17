@@ -5,7 +5,7 @@ Plugin URL: https://github.com/NateWr/asset-queue-manager
 Requires at Least: 4.0
 Tested Up To: 4.4
 Tags: developer, tool, debug, development, developer, debugging
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 Donate link: http://themeofthecrop.com
 
@@ -46,8 +46,11 @@ Go to the list of plugins in your admin panel. Find the Asset Queue Manager and 
 
 == Changelog ==
 
+= 1.0.2 (2016-02-17) =
+* Fix #4: allow assets with dots in the handle to be managed
+
 = 1.0.1 (2014-12-17) =
-* Fix critical bug where assets were only dequeued for logged in users with the admin bar present 
+* Fix critical bug where assets were only dequeued for logged in users with the admin bar present
 
 = 1.0 (2014-10-23) =
 * Initial release
