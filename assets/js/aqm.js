@@ -67,13 +67,22 @@ jQuery(document).ready(function ($) {
 			);
 
 			// Add assets to each section
-			for ( var loc in aqmData.assets ) {
-				for ( var type in aqmData.assets[loc] ) {
-					for ( var handle in aqmData.assets[loc][type] ) {
-						this.appendAsset( aqmData.assets[loc][type][handle], loc, type );
-					}
-				}
-			}
+ 			var T = this;
+                        $.each(aqmData.assets, function(loc_key, loc){
+
+                                if ($.type(loc) != 'array' && $.type(loc) != 'object'){
+                                        return;
+                                }
+
+                                $.each(loc, function(type_key, type){
+
+                                        $.each(type, function(key, asset){
+                                             T.appendAsset(asset, loc_key, type_key );
+                                        });
+
+                                });
+                        });
+
 
 			// Register open/close clicks on the whole panel
 			this.menu_el.click( function() {
@@ -181,7 +190,11 @@ jQuery(document).ready(function ($) {
 		// Try to get a good URL for this asset. This is just kind of
 		// guessing, really.
 		getAssetURL : function( asset ) {
-
+			// valid asset ?
+			if (!asset || !asset.src){
+                                return 'false';
+                        }
+                        
 			var url = asset.src.toString();
 			if ( url.substring( 0, 2 ) === '//' ) {
 				link = 'http:' + asset.src;
