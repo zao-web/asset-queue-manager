@@ -11,7 +11,7 @@ jQuery(document).ready(function ($) {
 
 	// Bail early if we're missing the aqm or aqmData vars. We won't get
 	// very far without them.
-	if ( typeof aqm === undefined || typeof aqmData === undefined ) {
+	if ( typeof aqm === 'undefined' || typeof aqmData === 'undefined' ) {
 		return;
 	}
 
@@ -66,23 +66,21 @@ jQuery(document).ready(function ($) {
 				'</div>'
 			);
 
-			// Add assets to each section
- 			var T = this;
-                        $.each(aqmData.assets, function(loc_key, loc){
+            // Add assets to each section
+            var self = this;
+            $.each(aqmData.assets, function(loc_key, loc){
 
-                                if ($.type(loc) != 'array' && $.type(loc) != 'object'){
-                                        return;
-                                }
+                // check type on first level - reject scalar values from processing
+                if ($.type(loc) != 'array' && $.type(loc) != 'object'){
+                    return;
+                }
 
-                                $.each(loc, function(type_key, type){
-
-                                        $.each(type, function(key, asset){
-                                             T.appendAsset(asset, loc_key, type_key );
-                                        });
-
-                                });
-                        });
-
+                $.each(loc, function(type_key, type){
+                    $.each(type, function(key, asset){
+                        self.appendAsset(asset, loc_key, type_key );
+                    });
+                });
+            });
 
 			// Register open/close clicks on the whole panel
 			this.menu_el.click( function() {
@@ -190,11 +188,7 @@ jQuery(document).ready(function ($) {
 		// Try to get a good URL for this asset. This is just kind of
 		// guessing, really.
 		getAssetURL : function( asset ) {
-			// valid asset ?
-			if (!asset || !asset.src){
-                                return 'false';
-                        }
-                        
+
 			var url = asset.src.toString();
 			if ( url.substring( 0, 2 ) === '//' ) {
 				link = 'http:' + asset.src;
