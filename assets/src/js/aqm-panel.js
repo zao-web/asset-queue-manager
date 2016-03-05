@@ -11,7 +11,7 @@ jQuery(document).ready(function ($) {
 
 	// Bail early if we're missing the aqm or aqmData vars. We won't get
 	// very far without them.
-	if ( typeof aqm === undefined || typeof aqmData === undefined ) {
+	if ( typeof aqm === 'undefined' || typeof aqmData === 'undefined' ) {
 		return;
 	}
 
