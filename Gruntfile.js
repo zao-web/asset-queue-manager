@@ -36,7 +36,6 @@ module.exports = function(grunt) {
 			build: {
 				files: {
 					'assets/js/aqm.js': [
-						'assets/src/js/aqm.js',
 						'assets/src/js/aqm-panel.js'
 					]
 				}
