@@ -66,14 +66,21 @@ jQuery(document).ready(function ($) {
 				'</div>'
 			);
 
-			// Add assets to each section
-			for ( var loc in aqmData.assets ) {
-				for ( var type in aqmData.assets[loc] ) {
-					for ( var handle in aqmData.assets[loc][type] ) {
-						this.appendAsset( aqmData.assets[loc][type][handle], loc, type );
-					}
-				}
-			}
+            // Add assets to each section
+            var self = this;
+            $.each(aqmData.assets, function(loc_key, loc){
+
+                // check type on first level - reject scalar values from processing
+                if ($.type(loc) != 'array' && $.type(loc) != 'object'){
+                    return;
+                }
+
+                $.each(loc, function(type_key, type){
+                    $.each(type, function(key, asset){
+                        self.appendAsset(asset, loc_key, type_key );
+                    });
+                });
+            });
 
 			// Register open/close clicks on the whole panel
 			this.menu_el.click( function() {
