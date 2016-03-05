@@ -188,6 +188,8 @@ jQuery(document).ready(function ($) {
 		// Try to get a good URL for this asset. This is just kind of
 		// guessing, really.
 		getAssetURL : function( asset ) {
+            // valid asset object ?
+            if (!asset || !asset.src){return 'false';}
 
 			var url = asset.src.toString();
 			if ( url.substring( 0, 2 ) === '//' ) {
