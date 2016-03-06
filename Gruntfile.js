@@ -79,7 +79,7 @@ module.exports = function(grunt) {
 	// Default task(s).
 	grunt.registerTask('default', ['watch']);
 
-    // build files for distribution
-    grunt.registerTask('dist', ['less', 'jshint', 'concat', 'uglify']);
+	// build files for distribution
+	grunt.registerTask('dist', ['less', 'jshint', 'concat', 'uglify']);
 
 };

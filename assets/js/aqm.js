@@ -66,21 +66,21 @@ jQuery(document).ready(function ($) {
 				'</div>'
 			);
 
-            // Add assets to each section
-            var self = this;
-            $.each(aqmData.assets, function(loc_key, loc){
+			// Add assets to each section
+			var self = this;
+			$.each(aqmData.assets, function(loc_key, loc){
 
-                // check type on first level - reject scalar values from processing
-                if ($.type(loc) != 'array' && $.type(loc) != 'object'){
-                    return;
-                }
+				// check type on first level - reject scalar values from processing
+				if ($.type(loc) != 'array' && $.type(loc) != 'object'){
+					return;
+				}
 
-                $.each(loc, function(type_key, type){
-                    $.each(type, function(key, asset){
-                        self.appendAsset(asset, loc_key, type_key );
-                    });
-                });
-            });
+				$.each(loc, function(type_key, type){
+					$.each(type, function(key, asset){
+						self.appendAsset(asset, loc_key, type_key );
+					});
+				});
+			});
 
 			// Register open/close clicks on the whole panel
 			this.menu_el.click( function() {
@@ -126,8 +126,8 @@ jQuery(document).ready(function ($) {
 			}
 
 			var url = this.getAssetURL( asset );
-			if ( url !== 'false' ) {
-				html += '<a href="' + this.getAssetURL( asset ) + '" target="_blank" class="view">' + aqm.strings.view + '</a>';
+			if ( url !== false ) {
+				html += '<a href="' + url + '" target="_blank" class="view">' + aqm.strings.view + '</a>';
 			}
 
 			html += '</div>'; // .links
@@ -188,8 +188,10 @@ jQuery(document).ready(function ($) {
 		// Try to get a good URL for this asset. This is just kind of
 		// guessing, really.
 		getAssetURL : function( asset ) {
-            // valid asset object ?
-            if (!asset || !asset.src){return 'false';}
+			// valid asset object ?
+			if (!asset || !asset.src){
+				return false;
+			}
 
 			var url = asset.src.toString();
 			if ( url.substring( 0, 2 ) === '//' ) {
