@@ -5,7 +5,7 @@ Plugin URL: https://github.com/NateWr/asset-queue-manager
 Requires at Least: 4.0
 Tested Up To: 4.4
 Tags: developer, tool, debug, development, developer, debugging
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 Donate link: http://themeofthecrop.com
 
@@ -45,6 +45,9 @@ Go to the list of plugins in your admin panel. Find the Asset Queue Manager and 
 2. View details about assets that are being dequeued by this plugin. Requeue them or view them for copying and minifying on your own.
 
 == Changelog ==
+
+= 1.0.3 (2016-03-10) =
+* Fix #5: issues with third-party code which extends native types. h/t @AndiDittrich of https://wordpress.org/plugins/enlighter/
 
 = 1.0.2 (2016-02-17) =
 * Fix #4: allow assets with dots in the handle to be managed
