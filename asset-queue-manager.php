@@ -22,10 +22,8 @@
  * You should have received a copy of the GNU General Public License along with this program; if not, write
  * to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-if ( ! defined( 'ABSPATH' ) )
-	exit;
+defined( 'ABSPATH' ) || die( '(╯°□°)╯︵ ┻━┻' );
 
-if ( !class_exists( 'aqmInit' ) ) {
 class aqmInit {
 
 	/**
@@ -99,7 +97,7 @@ class aqmInit {
 	 */
 	public function admin_bar_init() {
 
-		if ( !is_super_admin() || !is_admin_bar_showing() || $this->is_wp_login() ) {
+		if ( ! is_super_admin() || !is_admin_bar_showing() || $this->is_wp_login() ) {
 			return;
 		}
 
@@ -155,7 +153,7 @@ class aqmInit {
 		wp_enqueue_style( 'asset-queue-manager', self::$plugin_url . '/assets/css/aqm.css' );
 
 		// Load unminified scripts in debug mode
-		if ( WP_DEBUG ) {
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
 			wp_enqueue_script( 'asset-queue-manager', self::$plugin_url . '/assets/js/aqm.js', array( 'jquery' ), '', true );
 		} else {
 			wp_enqueue_script( 'asset-queue-manager', self::$plugin_url . '/assets/js/aqm.min.js', array( 'jquery' ), '', true );
@@ -168,7 +166,7 @@ class aqmInit {
 			array(
 				'nonce'		=> wp_create_nonce( 'asset-queue-manager' ),
 				'siteurl'	=> get_bloginfo( 'url' ),
-				'ajaxurl'	=> admin_url('admin-ajax.php'),
+				'ajaxurl'	=> admin_url( 'admin-ajax.php' ),
 				'strings'	=> array(
 					'head_scripts'		=> __( 'Head Scripts', 'asset-queue-manager' ),
 					'footer_scripts'	=> __( 'Footer Scripts', 'asset-queue-manager' ),
@@ -477,9 +475,9 @@ class aqmInit {
 
 			wp_send_json_success(
 				array(
-					'type' => $type,
-					'handle' => $handle,
-					'option' => $this->assets['dequeued'],
+					'type'    => $type,
+					'handle'  => $handle,
+					'option'  => $this->assets['dequeued'],
 					'dequeue' => false
 				)
 			);
@@ -519,17 +517,9 @@ class aqmInit {
 	}
 
 }
-} // endif;
 
-/**
- * This function returns one aqmInit instance everywhere
- * and can be used like a global, without needing to declare the global.
- *
- * Example: $aqm = aqmInit();
- */
-if ( !function_exists( 'aqmInit' ) ) {
 function aqmInit() {
 	return aqmInit::instance();
 }
+
 add_action( 'plugins_loaded', 'aqmInit' );
-} // endif;
