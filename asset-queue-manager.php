@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Asset Queue Manager
- * Plugin URI: https://github.com/NateWr/asset-queue-manager
+ * Plugin URI: https://github.com/zao-web/asset-queue-manager
  * Description: A tool for front-end experts to take control of all scripts and styles enqueued on their site.
- * Version: 1.0.3
+ * Version: 2.0.0
  * Author: Nate Wright
- * Author URI: https://github.com/NateWr
+ * Author URI: https://zao.is
  * License:     GNU General Public License v2.0 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -24,7 +24,7 @@
  */
 defined( 'ABSPATH' ) || die( '(╯°□°)╯︵ ┻━┻' );
 
-class aqmInit {
+class Asset_Queue_Manager {
 
 	/**
 	 * The single instance of this class
@@ -51,11 +51,11 @@ class aqmInit {
 	 *
 	 * @since 0.1
 	 */
-	public static function instance() {
+	public static function get_instance() {
 
 		if ( !isset( self::$instance ) ) {
 
-			self::$instance = new aqmInit;
+			self::$instance = new Asset_Queue_Manager;
 
 			self::$plugin_dir = untrailingslashit( plugin_dir_path( __FILE__ ) );
 			self::$plugin_url = untrailingslashit( plugin_dir_url( __FILE__ ) );
@@ -76,7 +76,7 @@ class aqmInit {
 
 		// Handle queue management requests via Ajax
 		add_action( 'wp_ajax_nopriv_aqm-modify-asset' , array( $this , 'ajax_nopriv_default' ) );
-		add_action( 'wp_ajax_aqm-modify-asset', array( $this, 'ajax_modify_asset' ) );
+		add_action( 'wp_ajax_aqm-modify-asset'        , array( $this, 'ajax_modify_asset' ) );
 
 		// Process an emergency restore request
 		add_action( 'init', array( $this, 'restore_queue' ) );
@@ -86,7 +86,7 @@ class aqmInit {
 		add_action( 'admin_bar_init', array( $this, 'admin_bar_init' ) );
 
 		// Deregister assets
-		add_action( 'wp_head', array( $this, 'deregister_assets' ), 7 );
+		add_action( 'wp_head'  , array( $this, 'deregister_assets' ), 7 );
 		add_action( 'wp_footer', array( $this, 'deregister_assets' ) );
 
 	}
@@ -518,8 +518,8 @@ class aqmInit {
 
 }
 
-function aqmInit() {
-	return aqmInit::instance();
+function aqm_init() {
+	return Asset_Queue_Manager::get_instance();
 }
 
-add_action( 'plugins_loaded', 'aqmInit' );
+add_action( 'plugins_loaded', 'aqm_init' );

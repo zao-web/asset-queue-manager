@@ -1,19 +1,19 @@
 === Asset Queue Manager ===
 Contributors: NateWr
-Author URI: https://github.com/NateWr
-Plugin URL: https://github.com/NateWr/asset-queue-manager
+Author URI: https://zao.is
+Plugin URL: https://github.com/zao-web/asset-queue-manager
 Requires at Least: 4.0
-Tested Up To: 4.4
+Tested Up To: 4.8
 Tags: developer, tool, debug, development, developer, debugging
-Stable tag: 1.0.3
+Stable tag: 2.0.0
 License: GPLv2 or later
-Donate link: http://themeofthecrop.com
+Donate link: https://zao.is
 
-A tool for experienced frontend performance engineers to take control over the scripts and styles enqueued on their site.
+A tool for experienced front-end performance engineers to take control over the scripts and styles enqueued on their site.
 
 == Description ==
 
-This tool allows you to monitor, dequeue and requeue scripts and styles that are enqueued on your site. It is designed for frontend performance engineers who want to view and manage all assets enqueued on any page and control the minification and concatenation themselves.
+This tool allows you to monitor, dequeue and re-enqueue scripts and styles that are enqueued on your site. It is designed for fron-tend performance engineers who want to view and manage all assets enqueued on any page and control the minification and concatenation themselves.
 
 For background, please read [Chris Coyier's initial request](https://gist.github.com/chriscoyier/2074e17ce9ae5e6d537e).
 
@@ -25,7 +25,7 @@ Once the plugin is activated, browse to any page on the front of your site. An A
 
 = Developers =
 
-Development takes place on [GitHub](https://github.com/NateWr/asset-queue-manager). Patches welcome.
+Development takes place on [GitHub](https://github.com/zao-web/asset-queue-manager). Patches welcome.
 
 == Installation ==
 
@@ -45,6 +45,10 @@ Go to the list of plugins in your admin panel. Find the Asset Queue Manager and 
 2. View details about assets that are being dequeued by this plugin. Requeue them or view them for copying and minifying on your own.
 
 == Changelog ==
+
+= 2.0.0 (2017-03-27) =
+* Enhancement: Can now select query variables like is_page(), is_page( ID ), is_post_type( $type ), is_front_page(), is_taxonomy_archive(), etc. to selectively dequeue on a per-page basis, rather than everywhere.
+* New owners: Hi! I'm Justin. Nate graciously allowed us over at Zao to adopt this plugin and we couldn't be more excited.
 
 = 1.0.3 (2016-03-10) =
 * Fix #5: issues with third-party code which extends native types. h/t @AndiDittrich of https://wordpress.org/plugins/enlighter/
