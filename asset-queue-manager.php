@@ -27,6 +27,13 @@ defined( 'ABSPATH' ) || die( '(╯°□°)╯︵ ┻━┻' );
 class Asset_Queue_Manager {
 
 	/**
+	 * Sets queried object's query vars.
+	 *
+	 * @since 2.0.0
+	 */
+	public $object_query_vars = array();
+
+	/**
 	 * The single instance of this class
 	 */
 	private static $instance;
@@ -34,12 +41,12 @@ class Asset_Queue_Manager {
 	/**
 	 * Path to the plugin directory
 	 */
-	static $plugin_dir;
+	public static $plugin_dir;
 
 	/**
 	 * URL to the plugin
 	 */
-	static $plugin_url;
+	public static $plugin_url;
 
 	/**
 	 * Array of assets to be managed
@@ -53,7 +60,7 @@ class Asset_Queue_Manager {
 	 */
 	public static function get_instance() {
 
-		if ( !isset( self::$instance ) ) {
+		if ( ! isset( self::$instance ) ) {
 
 			self::$instance = new Asset_Queue_Manager;
 
@@ -70,6 +77,8 @@ class Asset_Queue_Manager {
 	 * Initialize the plugin
 	 */
 	public function init() {
+
+		add_action( 'wp', array( $this, 'set_object_query_vars' ), 9999 );
 
 		// Textdomain
 		add_action( 'init', array( $this, 'load_textdomain' ) );
@@ -89,6 +98,30 @@ class Asset_Queue_Manager {
 		add_action( 'wp_head'  , array( $this, 'deregister_assets' ), 7 );
 		add_action( 'wp_footer', array( $this, 'deregister_assets' ) );
 
+	}
+
+	public function set_object_query_vars( $wp ) {
+		$q = $GLOBALS['wp_query'];
+
+		$vars = [
+			'post_type' => $q->get( 'post_type' ),
+			'is_front_page' => is_front_page()
+		];
+
+		foreach ( $q as $key => $val ) {
+			if ( $val && false !== strpos( $key, 'is_' ) ) {
+				$vars[ $key ] = $val;
+			}
+		}
+
+		$object = $q->get_queried_object();
+
+		if ( $object ) {
+			$vars['post_type'] = $object->post_type;
+			$vars['id']        = $object->ID;
+		}
+
+		$this->object_query_vars = $vars;
 	}
 
 	/**
