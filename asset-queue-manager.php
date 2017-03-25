@@ -116,8 +116,11 @@ class Asset_Queue_Manager {
 
 		$object = $q->get_queried_object();
 
-		if ( $object ) {
+		if ( $object && isset( $object->post_type ) ) {
 			$vars['post_type'] = $object->post_type;
+		}
+
+		if ( $object && isset( $object->ID ) ) {
 			$vars['id']        = $object->ID;
 		}
 
@@ -335,13 +338,11 @@ class Asset_Queue_Manager {
 	 * Add an Assets item to the admin bar menu
 	 * @since 0.0.1
 	 */
-	public function admin_bar_menu() {
+	public function admin_bar_menu( $wp_admin_bar ) {
 
 		if ( is_admin() ) {
 			return;
 		}
-
-		global $wp_admin_bar;
 
 		$recovery_message = sprintf( __( 'The Asset Queue Manager panel did not load. This can happen if jQuery is not being loaded on the page. If you have encountered this error after dequeuing an asset by mistake, you can %srestore all assets%s dequeued by Asset Queue Manager. This message is only shown to administrators.', 'asset-queue-manager' ), '<a href="' . admin_url() . '?aqm=restore">', '</a>' );
 
@@ -369,8 +370,9 @@ class Asset_Queue_Manager {
 		$this->get_dequeued_assets();
 
 		$data = array(
-			'assets'	=> $this->assets,
-			'notices'	=> $this->get_notices(),
+			'assets'	  => $this->assets,
+			'notices'	  => $this->get_notices(),
+			'query_vars'  => $this->object_query_vars
 		);
 
 		?>
@@ -439,7 +441,7 @@ class Asset_Queue_Manager {
 	 */
 	public function ajax_modify_asset() {
 
-		if ( !check_ajax_referer( 'asset-queue-manager', 'nonce' ) ||  !is_super_admin() ) {
+		if ( ! check_ajax_referer( 'asset-queue-manager', 'nonce' ) ||  !is_super_admin() ) {
 			$this->ajax_nopriv_default();
 		}
 

@@ -90,6 +90,19 @@ jQuery(document).ready(function ($) {
 			// Remove the emergency fallback panel
 			this.menu_el.find( '.inactive' ).remove();
 
+			this.el.on( 'click', '.query-variables input', function() {
+				var $this = $( this );
+				var $parent = $this.parents( 'div.query-variables' );
+
+				if ( $this.hasClass( 'everywhere' ) && $this.is( ':checked' ) ) {
+					$( 'input', $parent ).not( '.everywhere' ).prop( 'checked', false );
+				}
+
+				if ( ! $this.hasClass( 'everywhere' ) && $this.is( ':checked' ) && $( 'input.everywhere', $parent ).is( ':checked' ) ) {
+					$( 'input.everywhere', $parent ).prop( 'checked', false );
+				}
+			} );
+
 		},
 
 		// Add an asset to the panel
@@ -116,6 +129,12 @@ jQuery(document).ready(function ($) {
 				html += '<p class="deps"><strong>' + aqm.strings.deps + '</strong> ' + asset.deps.join( ', ' ) + '</p>';
 			}
 
+			// Suggest dependencies
+			html += '<div class="query-variables"><p>Check all the conditions that should apply when queueing this asset.';
+			html += this.getConditionals();
+			html += '</div>';
+
+
 			// Add action links
 			html += '<div class="links">';
 
@@ -139,8 +158,12 @@ jQuery(document).ready(function ($) {
 			var cur = this.el.find( '.asset.handle-' + asset.handle.replace(/\./g, "\\.") + '.' + type );
 
 			// Register click function to open/close asset panel
-			cur.click( function() {
-				aqmPanel.toggleAsset( $(this) );
+			cur.click( function(e) {
+				var node = e.target.nodeName;
+
+				if ( 'LI' !== node && 'INPUT' !== node && 'LABEL' !== node ) {
+					aqmPanel.toggleAsset( $(this) );
+				}
 			});
 
 			// Register click function to select all in disabled source input field
@@ -183,6 +206,22 @@ jQuery(document).ready(function ($) {
 			}
 
 			return notices;
+		},
+
+		getConditionals : function() {
+			var $html = $( '<ul><li><label><input name="conditions[everywhere]" checked="checked" type="checkbox" class="everywhere" /> Everywhere</label></li></ul>' );
+
+			$html.append( '<li data-id="' + aqmData.query_vars.id + '"><label><input name="conditions[id]" value="' + aqmData.query_vars.id + '" type="checkbox" /> Only this ' + aqmData.query_vars.post_type + '</label></li>' );
+
+			if ( aqmData.query_vars.post_type && aqmData.query_vars.is_singular ) {
+				$html.append( '<li data-post-type="' + aqmData.query_vars.post_type + '"><label><input name="conditions[post_type]" value="' + aqmData.query_vars.post_type + '" type="checkbox" /> All ' + aqmData.query_vars.post_type + 's</label></li>' );
+			}
+
+			if ( aqmData.query_vars.is_front_page ) {
+				$html.append( '<li><label><input name="conditions[is_front_page]" type="checkbox" /> On front page </label></li>' );
+			}
+
+			return '<ul>' + $html.html() + '</ul>';
 		},
 
 		// Try to get a good URL for this asset. This is just kind of
