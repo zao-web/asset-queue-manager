@@ -1,0 +1,15 @@
+{
+    "name": "zao-web/asset-queue-manager",
+    "type": "wordpress-plugin",
+    "require": {
+        "composer/installers": "^1.5"
+    },
+    "license": "GPLv2",
+    "authors": [
+        {
+            "name": "Nate Wright",
+            "email": "email@zao.is"
+        }
+    ],
+    "minimum-stability": "stable"
+}
